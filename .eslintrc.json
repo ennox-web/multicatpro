@@ -1,3 +1,19 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  // Base configuration for JavaScript files
+  "extends": [
+    "next/core-web-vitals", // Next.js core web vitals plugin to avoid build warnings
+    "plugin:prettier/recommended" // Integrates Prettier with ESLint
+  ],
+  "overrides": [
+    {
+      // Configuration specifically for TypeScript files
+      "files": ["**/*.ts", "**/*.tsx", "**/*.mts"], // Applies these rules only to TypeScript files
+      "plugins": ["@typescript-eslint", "unused-imports", "simple-import-sort"],
+      "extends": ["next/core-web-vitals", "plugin:prettier/recommended"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      }
+    }
+  ]
 }

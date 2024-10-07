@@ -6,19 +6,49 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint --fix && prettier '**/*.{json,yaml}' --write --ignore-path .gitignore",
+    "eslint-only": "next lint --ignore-path .gitignore",
+    "cy:local": "cypress run --config-file cypress/config/dev.config.ts",
+    "cy:staging": "cypress run --config-file cypress/config/staging.config.ts",
+    "cy:prod": "cypress run --config-file cypress/config/prod.config.ts",
+    "cy:open": "cypress open --config-file cypress/config/dev.config.ts"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.14"
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-brands-svg-icons": "^6.6.0",
+    "@fortawesome/free-regular-svg-icons": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+
+    "autoprefixer": "10.4.14",
+    "clsx": "^2.1.1",
+    "next": "14.2.14",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scroll": "^1.9.0",
+    "typescript": "^5",
+    "uuid": "^10.0.0",
+    "vercel": "^37.5.2"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@testing-library/cypress": "^10.0.2",
+    "@typescript-eslint/parser": "^8.8.0",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.14"
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-scroll": "^1.8.10",
+    "@types/uuid": "^10.0.0",
+    "cypress": "^13.14.2",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.14",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "prettier": "^3.3.3"
   }
 }
