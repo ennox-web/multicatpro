@@ -1,36 +1,42 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Getting Started
 
-First, run the development server:
+## Requirements
+* [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+* Docker Hub credentials and access to repository (Currently Private)
 
+
+## Installation
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# API requirements
+python3 -m venv multicat-env
+source multicat-env/bin/activate
+pip install -r src/api/requirements.txt
+
+# Frontend requirements
+pnpm install
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setting Up Local Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+For starting the backend locally environment with docker:
 
-## Learn More
+* Ensure Docker Desktop is running
+* Run the following command:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+GraphQL documentation will be available at [http://localhost:8000/api/graphql](http://localhost:8000/api/graphql).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Using kubernetes
+# Requires kind and local files defining Docker secrets
+sh ./create-local-k8s-cluster.sh
+```

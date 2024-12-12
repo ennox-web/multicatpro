@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: multicat-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multicat-frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: multicat-frontend
+    spec:
+      containers:
+        - env:
+            - name: NODE_ENV
+              value: development
+            - name: WATCHPACK_POLLING
+              value: "true"
+          name: multicat-frontend
+          image: ennox00/noxious:multicat-frontend-v1
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app
+              name: frontend-cm0
+            - mountPath: /app/node_modules
+              name: frontend-claim1
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: docker-secret
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: multicat-frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

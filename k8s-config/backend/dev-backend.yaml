@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: multicat-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multicat-backend
+  template:
+    metadata:
+      labels:
+        app: multicat-backend
+    spec:
+      containers:
+        - env:
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_NAME
+                  name: env-local
+            - name: MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: MONGODB_URI
+                  name: env-local
+          image: ennox00/noxious:multicat-backend-v1
+          name: multicat-backend
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: docker-secret
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: multicat-backend
+spec:
+  type: NodePort
+  selector:
+    app: multicat-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 31001

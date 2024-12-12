@@ -1,0 +1,14 @@
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable pnpm
+RUN pnpm i --frozen-lockfile
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["pnpm", "run", "next-dev"]
