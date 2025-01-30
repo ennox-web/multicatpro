@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from mongoengine import disconnect
 from strawberry.fastapi import GraphQLRouter
 
-from api.schemas.users_schema import schema
+from api.schemas.schema import schema
 from api.db.client import client
 
 

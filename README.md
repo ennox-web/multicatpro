@@ -30,6 +30,7 @@ For starting the backend locally environment with docker:
 * Run the following command:
 
 ```bash
+# Run local Docker Desktop, then
 pnpm run dev
 ```
 
@@ -40,3 +41,8 @@ GraphQL documentation will be available at [http://localhost:8000/api/graphql](h
 # Requires kind and local files defining Docker secrets
 sh ./create-local-k8s-cluster.sh
 ```
+
+## Adding a new Document and Schema Type
+
+* Define the MongoDB document in [src/api/db/](./src/api/db/).
+* Define GraphQL Schema in [src/api/schemas/](./src/api/schemas/).

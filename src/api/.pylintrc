@@ -1,0 +1,8 @@
+[TEST]
+generated-members=objects
+
+[MESSAGES CONTROL]
+disable=too-few-public-methods
+
+[FORMAT]
+max-line-length=120

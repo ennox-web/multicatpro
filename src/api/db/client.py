@@ -1,3 +1,5 @@
+"""MongoDB Client."""
+
 from mongoengine import connect
 from api.config import MONGODB_URI, DB_NAME
 
