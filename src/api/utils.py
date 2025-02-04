@@ -1,9 +1,36 @@
 """GraphQL Utils."""
-from strawberry import UNSET
 from typing import List, TypeVar
+
+from strawberry import UNSET
+import bcrypt
+
 
 T = TypeVar('T')
 Y = TypeVar('Y')
+
+IGNORE_FIELDS = [
+    "id",
+    "oid",
+    "mark_for_deletion",
+    "fields",
+    "project_templates",
+    "project_type_id",
+    "tag_names",
+    "projects"
+]
+
+
+def verify_password(plain_password, hashed_password):
+    """Verify user password."""
+    password_byte_enc = plain_password.encode('utf-8')
+    return bcrypt.checkpw(password_byte_enc, hashed_password)
+
+
+def get_hashed_password(password: str):
+    """Get the hashed password."""
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password=pwd_bytes, salt=salt)
 
 
 def get_graphql_type_fields_name(type_: T) -> List[str]:

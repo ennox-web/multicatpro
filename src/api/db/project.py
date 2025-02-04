@@ -11,19 +11,23 @@ from mongoengine import (
     ListField,
     Document,
     FloatField,
-    EmbeddedDocumentListField
+    EmbeddedDocumentListField,
+    LazyReferenceField,
+    CASCADE,
+    PULL
 )
 
 from api.db.project_type import ProjectType, Field
+from api.db.user import User
 from api.db.tag import Tag
 
 
 
 class Project(Document):
     """Project Document for MongoDB."""
-    oid = ObjectIdField()
+    user = LazyReferenceField(User, required=True, reverse_delete_rule=CASCADE)
     name = StringField(required=True, max_length=60)
-    project_type = ReferenceField(ProjectType)
+    project_type = ReferenceField(ProjectType, reverse_delete_rule=PULL)
     project_template_id = ObjectIdField()
     fields = EmbeddedDocumentListField(Field)
 
@@ -31,7 +35,7 @@ class Project(Document):
     completed_on = DateTimeField()
     updated_on = DateTimeField(default=datetime.today())
 
-    tags = ListField(ReferenceField(Tag))
+    tags = ListField(ReferenceField(Tag), reverse_delete_rule=PULL)
     priority = IntField(default=0)
 
     progress = FloatField(default=0, required=True)
@@ -46,4 +50,3 @@ class Project(Document):
                 "name": self.project_type.name
             }
         }
-        data["tags"] = [{"oid": tag.id, "name": tag.name} for tag in Tag.objects()]

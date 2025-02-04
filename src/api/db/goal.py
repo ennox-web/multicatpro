@@ -12,10 +12,12 @@ from mongoengine import (
     BooleanField,
     EnumField,
     IntField,
-    PULL
+    PULL,
+    CASCADE
 )
 
 from api.db.project import Project
+from api.db.user import User
 
 
 class GoalType(Enum):
@@ -26,8 +28,9 @@ class GoalType(Enum):
 
 class Goal(Document):
     """Goal Document for MongoDB."""
-    projects = ListField(LazyReferenceField(Project, reverse_delete_rule=PULL))
+    user = LazyReferenceField(User, reverse_delete_rule=CASCADE)
     name = StringField()
+    projects = ListField(LazyReferenceField(Project, reverse_delete_rule=PULL))
     last_update = DateTimeField(default=datetime.today())
     active = BooleanField(default=True)
     completed = BooleanField(default=False)

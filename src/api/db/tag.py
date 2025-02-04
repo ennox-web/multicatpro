@@ -1,13 +1,13 @@
-"""Tag Mongo DB Schema."""
-
+"""Tag MongoDB Schema."""
 from mongoengine import (
-    Document,
-    ObjectIdField,
     StringField,
+    LazyReferenceField,
+    Document,
+    CASCADE
 )
-
+from api.db.user import User
 
 class Tag(Document):
-    """Tag Document for MongoDB"""
-    oid = ObjectIdField()
-    name = StringField()
+    """Tag EmbeddedDocument for MongoDB."""
+    name = StringField(required=True)
+    user = LazyReferenceField(User, required=True, reverse_delete_rule=CASCADE)

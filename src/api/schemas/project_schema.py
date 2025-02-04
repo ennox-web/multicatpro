@@ -8,28 +8,25 @@ import strawberry
 from mongoengine import DoesNotExist
 from mongoengine.connection import get_connection
 
-from api.db.project import Project, Tag
+from api.db.project import Project
 from api.db.project_type import ProjectType, Field
+from api.db.user import User
+from api.db.tag import Tag
+from api.schemas.tag_schema import TagGQL
 from api.schemas.project_type_schema import ProjectTypeGQL, FieldTypeGQL, AddFieldTypeInput, UpdateFieldTypeInput
 from api.schemas.generic_schema import DelInput, UpdatedGQL
-from api.utils import convert_to_graphql_type
-
-
-@strawberry.type
-class TagGQL:
-    """Tag GraphQL Type."""
-    oid: strawberry.ID
-    name: str
+from api.utils import convert_to_graphql_type, setup_fields, IGNORE_FIELDS
 
 
 @strawberry.type
 class ProjectGQL:
     """Project GraphQL Type."""
-    oid: strawberry.ID
+    # user: LazyUserGQL
+    id: strawberry.ID
     name: str
     project_type: Optional[ProjectTypeGQL] = None
-    project_template_id: Optional[int] = None
-    fields: Optional[FieldTypeGQL] = None
+    project_template_id: Optional[strawberry.ID] = None
+    fields: Optional[List[FieldTypeGQL]] = None
 
     started_on: Optional[datetime] = None
     completed_on: Optional[datetime] = None
@@ -46,8 +43,8 @@ class ProjectGQL:
 class AddProjectInput:
     """ProjectInput GraphQL Type."""
     name: str
-    project_type_id: Optional[str] = None
-    project_template_id: Optional[int] = None
+    project_type_id: Optional[strawberry.ID] = None
+    project_template_id: Optional[strawberry.ID] = None
     fields: Optional[List[AddFieldTypeInput]] = None
     started_on: Optional[datetime] = None
     completed_on: Optional[datetime] = None
@@ -61,10 +58,10 @@ class AddProjectInput:
 @strawberry.input
 class UpdateProjectInput:
     """GraphQL Input for updating a Project."""
-    id: str
+    id: strawberry.ID
     name: Optional[str] = None
-    project_type_id: Optional[str] = None
-    project_template_id: Optional[int] = None
+    project_type_id: Optional[strawberry.ID] = None
+    project_template_id: Optional[strawberry.ID] = None
     fields: Optional[List[UpdateFieldTypeInput]] = None
     started_on: Optional[datetime] = None
     completed_on: Optional[datetime] = None
@@ -75,63 +72,81 @@ class UpdateProjectInput:
     active_step: Optional[int] = None
 
 
-def setup_project_fields(project_input: AddProjectInput | UpdateProjectInput, project: Project=None) -> dict:
-    """Setup Project fields based on input."""
-    fields = {}
-    updated_on = datetime.now()
+# SETUP FUNCTIONS
 
+def update_internal_field(field_input: UpdateFieldTypeInput, project: Project):
+    """Update an existing Field for a Project."""
+    print(f"Field to update {field_input}")
+    current_field = project.fields.filter(oid=field_input.id).first()
+    if current_field:
+        if hasattr(field_input, "mark_for_deletion") and field_input.mark_for_deletion:
+            index = project.fields.index(current_field)
+            del project.fields[index]
+        else:
+            setup_fields(field_input, IGNORE_FIELDS, current_field)
+
+
+def setup_internal_fields(fields: List[UpdateFieldTypeInput], project: Project=None):
+    """Setup Fields for Project."""
+    field_objects = []
+    for field in fields:
+        if hasattr(field, "oid") and project:
+            update_internal_field(field, project)
+        else:
+            new_field_data = setup_fields(field, IGNORE_FIELDS)
+            field_objects.append(Field(**new_field_data))
+    return field_objects
+
+
+
+def setup_tags(tag_names: List[str], user: User) -> List[Tag]:
+    """Setup Project Tags."""
     tags = []
-    if project_input.tag_names:
-        for tag_name in project_input.tag_names:
+    if tag_names:
+        for tag_name in tag_names:
             try:
-                tag = Tag.objects.get(name=tag_name)
+                tag = None
+                if user:
+                    tag = Tag.objects(user=user, name=tag_name).first()
+                if not tag:
+                    raise DoesNotExist
             except DoesNotExist:
-                tag = Tag(name=tag_name).save()
-                tag.oid = tag.id  # pylint: disable=no-member
+                tag = Tag(name=tag_name, user=user)
                 tag.save()
-            tags.append(tag)
 
+            print(f"TAG NAME: {tag.name}")
+            tags.append(tag)
+        user.save()
+
+    return tags
+
+
+def setup_project_fields(
+    project_input: AddProjectInput | UpdateProjectInput,
+    user: User,
+    project: Project=None,
+) -> dict:
+    """Setup Project fields based on input."""
+    fields = setup_fields(project_input, IGNORE_FIELDS)
+    fields["updated_on"] = datetime.now()
+
+    # Setup Tags
+    tags = setup_tags(project_input.tag_names, user=user)
+    if len(tags) > 0:
         fields["tags"] = tags
 
-    for key, value in project_input.__dict__.items():
-        if value is not None and key not in ("id", "project_type_id", "tag_names", "fields"):
-            fields[key] = value
-
     if project_input.fields:
-        field_objects = []
-        for field in project_input.fields:
-            if field.id and project:
-                try:
-                    print(f"Field to update {field}")
-                    current_field = project.fields.filter(oid=field.id).first()
-                    if current_field:
-                        for key, value in field.__dict__.items():
-                            print(f"key: {key}; value: {value}")
-                            if value is not None and key not in ("id", "mark_for_deletion"):
-                                current_field[key] = value
-                        # project.fields.filter(oid=field.id).update(**field_data)
-                        project.save()
-                except Exception as e:  # pylint: disable=broad-exception-caught
-                    print(f"FAIL: {e}")
-            else:
-                field_objects.append(
-                    Field(
-                        label=field.label,
-                        data_type=field.data_type,
-                        content={"content": field.content},
-                        description=field.description
-                    )
-                )
-        if len(field_objects) > 0:
-            fields["fields"] = field_objects
+        internal_fields = setup_internal_fields(project_input.fields, project=project)
+        if len(internal_fields) > 0:
+            fields["fields"] = internal_fields
 
     if project_input.project_type_id:
         project_type = ProjectType.objects.get(id=ObjectId(project_input.project_type_id))
         fields["project_type"] = project_type
 
-    fields["updated_on"] = updated_on
-
     print(fields)
+    if project:
+        project.save()
 
     return fields
 
@@ -144,30 +159,35 @@ class ProjectQuery:
         """Get all Projects."""
         return [convert_to_graphql_type(project, ProjectGQL) for project in Project.objects]
 
+    @strawberry.field
+    def user_projects(self, info: strawberry.Info) -> List[ProjectGQL]:
+        """Get User's Projects."""
+        projects = Project.objects(user=info.context.user)
+        return [convert_to_graphql_type(project, ProjectGQL) for project in projects]
+
 
 @strawberry.type
 class ProjectMutation:
     """ProjectMutation GraphQL Type."""
     @strawberry.mutation
-    def add_project(self, project_input: AddProjectInput) -> ProjectGQL:
+    def add_project(self, info: strawberry.Info, project_input: AddProjectInput) -> ProjectGQL:
         """Add a new Project to MongoDB."""
-        fields = setup_project_fields(project_input)
+        fields = setup_project_fields(project_input, user=info.context.user)
+        fields["user"] = info.context.user
 
         project = Project(**fields).save()
-        project.oid = project.id  # pylint: disable=no-member
-        project.save()
 
         return convert_to_graphql_type(project, ProjectGQL)
 
     @strawberry.mutation
-    def delete_project(self, project_input: DelInput) -> UpdatedGQL:
+    def delete_project(self, info: strawberry.Info, project_input: DelInput) -> UpdatedGQL:
         """Delete a Project from MongoDB"""
         mongo = get_connection()
 
         with mongo.start_session() as session:
             with session.start_transaction():
                 try:
-                    project = Project.objects.get(id=ObjectId(project_input.id))
+                    project = Project.objects.get(id=ObjectId(project_input.id), user=info.context.user)
                     project.delete()
                 except Exception as e:  # pylint: disable=broad-exception-caught
                     session.abort_transaction()
@@ -184,14 +204,14 @@ class ProjectMutation:
 
     # Find relevent goals and upate progress
     @strawberry.mutation
-    def update_project(self, project_input: UpdateProjectInput) -> UpdatedGQL:
+    def update_project(self, info: strawberry.Info, project_input: UpdateProjectInput) -> UpdatedGQL:
         """Update a Project in MongoDB."""
         mongo = get_connection()
         with mongo.start_session() as session:
             with session.start_transaction():
                 try:
-                    project = Project.objects.get(id=ObjectId(project_input.id))
-                    fields = setup_project_fields(project_input, project=project)
+                    project = Project.objects.get(id=ObjectId(project_input.id), user=info.context.user)
+                    fields = setup_project_fields(project_input, info.context.user, project=project)
                     project.update(**fields)
                 except Exception as e:  # pylint: disable=broad-exception-caught
                     session.abort_transaction()
@@ -204,36 +224,3 @@ class ProjectMutation:
             updated=True,
             oid=project_input.id,
         )
-
-
-# """
-
-# @strawberry.type
-# class Author:
-#     id: int
-#     name: str
-
-# @strawberry.type
-# class Book:
-#     id: int
-#     title: str
-#     author: Author
-
-# @strawberry.input
-# class CreateBookInput:
-#     title: str
-#     author_id: int
-
-# @strawberry.type
-# class Mutation:
-#     @strawberry.mutation
-#     async def create_book(self, info, input: CreateBookInput) -> Book:
-#         # Assume we have a database connection here
-#         author = await get_author_by_id(input.author_id)  # Implement this function
-#         if not author:
-#             raise Exception("Author not found")
-
-#         new_book = await create_book_in_db(input.title, author.id)  # Implement this function
-#         return Book(id=new_book.id, title=new_book.title, author=author)
-
-# """

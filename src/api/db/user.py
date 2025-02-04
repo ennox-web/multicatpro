@@ -1,13 +1,14 @@
-"""Users MongoDB Schema."""
+"""User MongoDB Schema."""
 
 from mongoengine import (
     Document,
-    StringField
+    StringField,
+    BinaryField
 )
 
 
-class Users(Document):
+class User(Document):
     """Test Users Document for MongoDB."""
     username = StringField(max_length=16, required=True)
-    password = StringField(max_length=30, required=True)
+    password = BinaryField(required=True)
     email = StringField(required=True)

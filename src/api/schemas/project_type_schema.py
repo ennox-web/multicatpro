@@ -11,7 +11,7 @@ from api.db.project_type import ProjectType, ProjectTemplate, Field, FieldTypes
 from api.db.project import Project
 from api.utils import convert_to_graphql_type
 from api.schemas.generic_schema import DelInput, UpdatedGQL
-from api.utils import setup_fields
+from api.utils import setup_fields, IGNORE_FIELDS
 
 # GQL TYPES
 
@@ -109,7 +109,7 @@ def update_template_field(field_input: UpdateFieldTypeInput, project_template: P
 
         # Otherwise, the field will be updated
         else:
-            setup_fields(field_input, ["oid", "mark_for_deletion"], current_field)
+            setup_fields(field_input, IGNORE_FIELDS, current_field)
 
 
 def setup_template_fields(fields: List[UpdateFieldTypeInput], project_template: ProjectTemplate):
@@ -121,7 +121,7 @@ def setup_template_fields(fields: List[UpdateFieldTypeInput], project_template: 
 
         # Otherwise, we should add a new field to the current template
         else:
-            new_field = setup_fields(field, ["oid", "mark_for_deletion"])
+            new_field = setup_fields(field, IGNORE_FIELDS)
             project_template.fields.append(Field(**new_field))
 
 
@@ -137,7 +137,7 @@ def update_project_template(project_template_input: UpdateProjectTemplateInput, 
 
         # Otherwise, the project_template will be updated
         else:
-            setup_fields(project_template_input, ["oid", "fields", "mark_for_deletion"], current_template)
+            setup_fields(project_template_input, IGNORE_FIELDS, current_template)
 
             # Setup Project Template Fields
             if hasattr(project_template_input, "fields"):
@@ -151,7 +151,7 @@ def setup_project_type_fields(
         project_type_input: AddProjectTypeInput | UpdateProjectTypeInput, project_type: ProjectType = None
     ):
     """Setup fields for ProjectTypes"""
-    fields = setup_fields(project_type_input, ["id", "project_templates"])
+    fields = setup_fields(project_type_input, IGNORE_FIELDS)
 
     # Setup Project Template
     if (
@@ -166,11 +166,11 @@ def setup_project_type_fields(
             # Otherwise, add a new ProjectTemplate
             else:
                 templates = []
-                new_proj_template = setup_fields(project_template, ["oid", "fields", "mark_for_deletion"])
+                new_proj_template = setup_fields(project_template, IGNORE_FIELDS)
                 if hasattr(project_template, "fields") and project_template.fields is not strawberry.UNSET:
                     field_objects = []
                     for field in project_template.fields:
-                        field_objects.append(Field(**setup_fields(field, ["oid", "mark_for_deletion"])))
+                        field_objects.append(Field(**setup_fields(field, IGNORE_FIELDS)))
                     new_proj_template["fields"] = field_objects
                 templates.append(ProjectTemplate(**new_proj_template))
                 fields["project_templates"] = templates
@@ -183,9 +183,18 @@ def setup_project_type_fields(
 class ProjectTypeQuery:
     """ProjectTypeQuery GraphQL Type."""
     @strawberry.field
-    def project_types(self) -> List[ProjectTypeGQL]:
+    def all_project_types(self) -> List[ProjectTypeGQL]:
         """Get all Projects."""
         return [convert_to_graphql_type(project_type, ProjectTypeGQL) for project_type in ProjectType.objects]
+
+    @strawberry.field
+    def user_project_types(self, info: strawberry.Info) -> List[ProjectTypeGQL]:
+        """Get user's Project Types."""
+        print(info.context.user)
+        return [
+            convert_to_graphql_type(project_type, ProjectTypeGQL)
+            for project_type in ProjectType.objects(user=info.context.user)
+        ]
 
 
 # GQL MUTATIONS
@@ -195,31 +204,35 @@ class ProjectTypeMutation:
     """ProjectTypeMutation GraphQL Type."""
 
     @strawberry.mutation
-    def add_project_type(self, project_type: AddProjectTypeInput) -> ProjectTypeGQL:
+    def add_project_type(self, info: strawberry.Info, project_type: AddProjectTypeInput) -> ProjectTypeGQL:
         """Add a new ProjectType to MongoDB."""
         fields = setup_project_type_fields(project_type)
+        fields["user"] = info.context.user
         project = ProjectType(**fields).save()
 
         return convert_to_graphql_type(project, ProjectTypeGQL)
 
-    @strawberry.mutation
-    def add_project_types(self, project_types: List[AddProjectTypeInput]) -> List[ProjectTypeGQL]:
-        """Add Multiple Project Types to MongoDB."""
-        project_type_gqls = []
-        for project_type in project_types:
-            project_type_gqls.append(self.add_project_type(project_type))
+    # @strawberry.mutation
+    # def add_project_types(self, project_types: List[AddProjectTypeInput]) -> List[ProjectTypeGQL]:
+    #     """Add Multiple Project Types to MongoDB."""
+    #     project_type_gqls = []
+    #     for project_type in project_types:
+    #         project_type_gqls.append(self.add_project_type(project_type))
 
-        return [convert_to_graphql_type(project_type_gql, ProjectTypeGQL) for project_type_gql in project_type_gqls]
+    #     return project_type_gqls
 
     @strawberry.mutation
-    def delete_project_type(self, project_type_input: DelInput) -> UpdatedGQL:
+    def delete_project_type(self, info: strawberry.Info, project_type_input: DelInput) -> UpdatedGQL:
         """Delete a ProjectType from MongoDB."""
         mongo = get_connection()
 
         with mongo.start_session() as session:
             with session.start_transaction():
                 try:
-                    project_type = ProjectType.objects.get(id=ObjectId(project_type_input.id))
+                    project_type = ProjectType.objects(
+                        id=ObjectId(project_type_input.id),
+                        user=info.context.user
+                    ).first()
                 except DoesNotExist:
                     session.abort_transaction()
                     return UpdatedGQL(
@@ -232,7 +245,6 @@ class ProjectTypeMutation:
                     projects = Project.objects(project_type=project_type)
                     if projects:
                         projects.update(
-                            unset__project_type=True,
                             unset__project_template=True
                         )
                     project_type.delete()
@@ -246,24 +258,27 @@ class ProjectTypeMutation:
 
         return UpdatedGQL(updated=True, oid=project_type_input.id, error=None)
 
-    @strawberry.mutation
-    def delete_project_types(self, project_types: List[DelInput]) -> List[UpdatedGQL]:
-        """Delete multiple project types from MongoDB."""
-        updated_types = []
-        for project_type in project_types:
-            updated_types.append(self.delete_project_type(project_type))
+    # @strawberry.mutation
+    # def delete_project_types(self, project_types: List[DelInput]) -> List[UpdatedGQL]:
+    #     """Delete multiple project types from MongoDB."""
+    #     updated_types = []
+    #     for project_type in project_types:
+    #         updated_types.append(self.delete_project_type(project_type))
 
-        return [convert_to_graphql_type(updated_type, UpdatedGQL) for updated_type in updated_types]
+    #     return [convert_to_graphql_type(updated_type, UpdatedGQL) for updated_type in updated_types]
 
     @strawberry.mutation
-    def update_project_type(self, project_type_input: UpdateProjectTypeInput) -> UpdatedGQL:
+    def update_project_type(self, info: strawberry.Info, project_type_input: UpdateProjectTypeInput) -> UpdatedGQL:
         """Update a ProjectType in MongoDB"""
         mongo = get_connection()
 
         with mongo.start_session() as session:
             with session.start_transaction():
                 try:
-                    project_type = ProjectType.objects.get(id=ObjectId(project_type_input.id))
+                    project_type = ProjectType.objects(
+                        id=ObjectId(project_type_input.id),
+                        user=info.context.user
+                    ).first()
                 except DoesNotExist:
                     session.abort_transaction()
                     return UpdatedGQL(

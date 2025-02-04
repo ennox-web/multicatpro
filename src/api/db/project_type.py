@@ -5,7 +5,6 @@ from typing import Union, List
 from enum import Enum
 from bson.objectid import ObjectId
 
-
 from mongoengine import (
     DictField,
     Document,
@@ -14,8 +13,12 @@ from mongoengine import (
     EnumField,
     ObjectIdField,
     StringField,
-    ValidationError
+    ValidationError,
+    LazyReferenceField,
+    CASCADE
 )
+
+from api.db.user import User
 
 
 # The FieldTypes enum mapped to expected Python types.
@@ -63,5 +66,6 @@ class ProjectTemplate(EmbeddedDocument):
 
 class ProjectType(Document):
     """ProjectType Document for MongoDB."""
+    user = LazyReferenceField(User, required=True, reverse_delete_rule=CASCADE)
     name = StringField(required=True)
     project_templates = EmbeddedDocumentListField(ProjectTemplate)

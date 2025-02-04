@@ -7,7 +7,7 @@ import strawberry
 @strawberry.input
 class DelInput:
     """GraphQL Input for deleting."""
-    id: str
+    id: strawberry.ID
 
 
 @strawberry.type
@@ -16,3 +16,10 @@ class UpdatedGQL:
     updated: bool
     oid: strawberry.ID
     error: Optional[str] = None
+
+
+# @strawberry.type
+# class LazyUserGQL:
+#     """LazyReference User GraphQL Type."""
+#     id: strawberry.ID
+#     user_id: strawberry.ID
