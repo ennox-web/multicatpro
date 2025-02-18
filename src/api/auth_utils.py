@@ -12,12 +12,21 @@ from jwt.exceptions import InvalidTokenError
 from strawberry.fastapi import BaseContext
 from mongoengine.errors import DoesNotExist
 
-from api.config import JWT_SECRET_KEY, JWT_ALGO
+from api.config import JWT_SECRET_KEY, JWT_ALGO, ACCESS_TOKEN_EXPIRE_MINUTES
 from api.db.user import User
 from api.utils import verify_password
+from api.db.token_blacklist import TokenBlacklist
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
+
+class Token(BaseModel):
+    """Token Model."""
+    user_id: str
+    username: str
+    email: str
+    access_token: str
+    refresh_token: str
 
 
 # Figure out how all below can be part of the GraphQL CONTEXT
@@ -26,7 +35,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 # https://strawberry.rocks/docs/integrations/fastapi
 # https://gh0stfrk.medium.com/token-based-authentication-with-fastapi-7d6a22a127bf
 
-def authenticate_user(username: str, password: str):
+def authenticate_user(username: str, password: str) -> User:
     """Authenticates the user."""
     # Get user from DB
     # Pass password and user.hashed_password to verify_password()
@@ -58,6 +67,45 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGO)
 
 
+def blacklist_token(token: str) -> None:
+    """Blacklist a token."""
+    data = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGO])
+    expiration = datetime.fromtimestamp(data.get("exp"))
+    TokenBlacklist(token=token, expiration=expiration).save()
+
+
+def verify_and_refresh_token(token: str) -> Token | None:
+    """Refresh Token"""
+    blacklisted_token = TokenBlacklist.objects(token=token).first()
+    if blacklisted_token:
+        return None
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGO])
+        username: str = payload.get("sub").split("username:")[1]
+        if not username:
+            return None
+        user = User.objects(username=username).first()
+        if not user:
+            return None
+
+        new_access_token = create_access_token(
+            data={"sub": f"username:{user.username}"},
+            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        )
+
+        return Token(
+            user_id=str(user.id),
+            username=user.username,
+            email=user.email,
+            access_token=new_access_token,
+            refresh_token=token
+        )
+
+    except InvalidTokenError:  # pylint: disable=broad-exception-caught
+        return None
+    return None
+
+
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User | None:
     """Gets the current user."""
     credentials_exception = HTTPException(
@@ -71,7 +119,6 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User | No
         if username is None:
             raise credentials_exception
     except InvalidTokenError:
-        print("From InvalidTokenError")
         raise credentials_exception  # pylint: disable=raise-missing-from
 
     user = User.objects.get(username=username)
@@ -107,13 +154,6 @@ class Context(BaseContext):
 
         user = User.objects.get(username="blep")
         return user
-
-
-class Token(BaseModel):
-    """Token Model."""
-    access_token: str
-    # token_type: str
-    refresh_token: str
 
 
 async def get_context() -> Context:

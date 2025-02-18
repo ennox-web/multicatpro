@@ -76,7 +76,6 @@ class UpdateProjectInput:
 
 def update_internal_field(field_input: UpdateFieldTypeInput, project: Project):
     """Update an existing Field for a Project."""
-    print(f"Field to update {field_input}")
     current_field = project.fields.filter(oid=field_input.id).first()
     if current_field:
         if hasattr(field_input, "mark_for_deletion") and field_input.mark_for_deletion:
@@ -114,7 +113,6 @@ def setup_tags(tag_names: List[str], user: User) -> List[Tag]:
                 tag = Tag(name=tag_name, user=user)
                 tag.save()
 
-            print(f"TAG NAME: {tag.name}")
             tags.append(tag)
         user.save()
 
@@ -144,7 +142,6 @@ def setup_project_fields(
         project_type = ProjectType.objects.get(id=ObjectId(project_input.project_type_id))
         fields["project_type"] = project_type
 
-    print(fields)
     if project:
         project.save()
 

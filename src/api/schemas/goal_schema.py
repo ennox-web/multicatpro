@@ -76,8 +76,6 @@ class GoalMutation:
         fields = setup_goal_fields(goal_input, info.context.user)
         goal = Goal(**fields).save()
 
-        print(f"PROJECTS: {goal.projects}")
-
         return convert_to_graphql_type(goal, GoalGQL)
 
     @strawberry.mutation

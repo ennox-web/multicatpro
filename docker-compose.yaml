@@ -19,6 +19,8 @@ services:
       - type: bind
         source: ./data
         target: /data/db
+    networks:
+      - multicat-network
 
   api:
     image: ennox00/noxious:multicat-backend-v1
@@ -33,21 +35,32 @@ services:
           target: /api
     depends_on:
       - mongodb
+    networks:
+      - multicat-network
 
-  # frontend:
-  #   image: ennox00/noxious:multicat-frontend-v1
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.dev
-  #   environment:
-  #     - NODE_ENV=development
-  #     - WATCHPACK_POLLING=true
-  #   volumes:
-  #     - .:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - 3000:3000
+  frontend:
+    image: ennox00/noxious:multicat-frontend-v1
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file: ./src/app/.env.local
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - 'api'
+    links:
+      - api
+    networks:
+      - multicat-network
 
+networks:
+  multicat-network:
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

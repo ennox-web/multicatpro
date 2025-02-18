@@ -101,7 +101,6 @@ def update_template_field(field_input: UpdateFieldTypeInput, project_template: P
     """Update an existing Field in ProjectTemplate."""
     current_field = project_template.fields.filter(oid=field_input.oid).get()
     if current_field:
-        print(f"Update Template Fields: {current_field}")
         # Check if the field is marked for deletion
         if hasattr(field_input, "mark_for_deletion") and field_input.mark_for_deletion:
             index = project_template.fields.index(current_field)
@@ -190,7 +189,6 @@ class ProjectTypeQuery:
     @strawberry.field
     def user_project_types(self, info: strawberry.Info) -> List[ProjectTypeGQL]:
         """Get user's Project Types."""
-        print(info.context.user)
         return [
             convert_to_graphql_type(project_type, ProjectTypeGQL)
             for project_type in ProjectType.objects(user=info.context.user)

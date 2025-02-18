@@ -30,6 +30,7 @@ For starting the backend locally environment with docker:
 * Run the following command:
 
 ```bash
+# This will run docker-compose.yaml
 # Run local Docker Desktop, then
 pnpm run dev
 ```

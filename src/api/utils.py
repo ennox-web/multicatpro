@@ -69,9 +69,7 @@ def setup_fields(input_fields: object, ignore_keys: List[str], fields: dict = No
     if fields is None:
         fields = {}
     for key, value in input_fields.__dict__.items():
-        print(f"key: {key}; value: {value}")
         if value is UNSET:
-            print("UNSET!")
         if value is not UNSET and key not in ignore_keys:
             fields[key] = value
     return fields
