@@ -11,13 +11,15 @@ from api.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
 from api.schemas.schema import schema
 from api.db.client import client
 
-from api.auth_utils import authenticate_user,
+from api.auth_utils import (
+    authenticate_user,
     create_access_token,
     Token,
     get_context,
     verify_and_refresh_token,
     blacklist_token,
     oauth2_scheme
+)
 
 
 app = FastAPI()
