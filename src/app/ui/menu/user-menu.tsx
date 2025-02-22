@@ -4,11 +4,13 @@ import Link from 'next/link';
 import styles from './user-menu.module.css';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import Overlay from '@/app/account/overlay';
+import LoginOverlay from '@/app/account/login-overlay';
 
 interface MenuLink {
     name: string;
-    path: string;
+    onClick: () => void;
     style: string;
 }
 
@@ -16,35 +18,13 @@ interface UserMenuLinks {
     [key: string]: MenuLink[];
 }
 
-const userMenuLinks: UserMenuLinks = {
-    "loggedOut": [
-        {
-            name: "Sign In",
-            path: "/account/login",
-            style: styles.signInBtn,
-        },
-        {
-            name: "Create an Account",
-            path: "/account/signup",
-            style: styles.createAccount,
-        },
-    ],
-    "loggedIn": [
-        {
-            name: "Settings",
-            path: "/account/settings",
-            style: styles.settings,
-        },
-    ],
-}
-
-function UserMenuDropdown({ loggedIn }: { loggedIn: boolean }) {
+function UserMenuDropdown({ loggedIn, userMenuLinks }: { loggedIn: boolean, userMenuLinks: UserMenuLinks }) {
     const links = loggedIn ? userMenuLinks.loggedIn : userMenuLinks.loggedOut;
 
     return (
         <div className={styles.menuDropdown}>
             <div className={styles.dropDownContent}>
-                {links.map((link) => <Link href={link.path} className={link.style} key={link.name}>{link.name}</Link>)}
+                {links.map((link) => <button className={link.style} key={link.name} onClick={link.onClick}>{link.name}</button>)}
             </div>
         </div>
     )
@@ -54,8 +34,8 @@ function UserMenuDropdown({ loggedIn }: { loggedIn: boolean }) {
 export default function UserMenu() {
     const { data: session } = useSession();
     const router = useRouter();
-    const [showMenu, setShowMenu] = useState(false);
-    const [loggedIn, setLoggedIn] = useState(false);
+    const [showMenu, setShowMenu] = useState(true);
+    const [showOverlayType, setShowOverlayType] = useState('');
 
     function onClick() {
         if (!!session && !!session.user["username"]) {
@@ -63,6 +43,28 @@ export default function UserMenu() {
         } else {
             router.push('/account/login')
         }
+    }
+
+    const userMenuLinks: UserMenuLinks = {
+        "loggedOut": [
+            {
+                name: "Sign In",
+                onClick: () => { setShowOverlayType('login') },
+                style: `${styles.signInBtn} ${styles.userBtns}`,
+            },
+            {
+                name: "Create an Account",
+                onClick: () => { setShowOverlayType('signup') },
+                style: `${styles.createAccount} ${styles.userBtns}`,
+            },
+        ],
+        "loggedIn": [
+            {
+                name: "Settings",
+                onClick: () => { router.push("/account/settings") },
+                style: styles.settings,
+            },
+        ],
     }
 
     return (
@@ -80,9 +82,15 @@ export default function UserMenu() {
                     onMouseEnter={() => { setShowMenu(true) }}
                     onMouseLeave={() => { setShowMenu(false) }}
                 >
-                    <UserMenuDropdown loggedIn={!!session ? !!session.user["username"] : false} />
+                    <UserMenuDropdown loggedIn={!!session ? !!session.user["username"] : false} userMenuLinks={userMenuLinks} />
                 </div>
             )}
+            {showOverlayType === 'login' && (
+                <Overlay onClose={() => { setShowOverlayType('') }}>
+                    <LoginOverlay onClose={() => { setShowOverlayType('') }} />
+                </Overlay>
+            )
+            }
         </div>
     );
 }

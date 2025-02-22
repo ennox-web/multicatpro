@@ -6,7 +6,7 @@ import {auth, signIn} from "@/auth";
 export async function authenticate(formData: FormData) {
     try {
         console.log(formData);
-        const user = {email: formData.get("email"), password: formData.get("password"), redirect: false};
+        const user = {username: formData.get("username"), password: formData.get("password"), redirect: false};
         await signIn('credentials', user);
     } catch(error) {
         if(error instanceof AuthError) {
@@ -19,6 +19,7 @@ export async function authenticate(formData: FormData) {
             }
         throw error;
     }
+    return "Success";
 }
 
 export async function getUser() {

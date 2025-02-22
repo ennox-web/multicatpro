@@ -150,8 +150,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
                 const urlencoded = new URLSearchParams();
-                urlencoded.append("username", "blep");
-                urlencoded.append("password", "blepper");
+                urlencoded.append("username", credentials.username as string);
+                urlencoded.append("password", credentials.password as string);
 
                 const requestOptions = {
                     method: "POST",
@@ -163,7 +163,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     .then((response) => response)
                     .catch((error) => console.error(error));
 
-                if (response) {
+                if (response && response.ok) {
                     const data = await response.json();
                     console.log(data);
                     if (data) {

@@ -73,6 +73,24 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+input {
+    border-radius: 20px;
+    border: 2px solid var(--on-primary);
+    padding: 0 10px;
+    height: 2.5rem;
+    outline: none;
+    font-size: 1.2rem;
+}
+
+input:hover {
+    border: 2px solid var(--primary);
+}
+
+input:focus {
+    border: 2px solid var(--primary);
+    outline: none;
+}
 /*
 @media (prefers-color-scheme: dark) {
   html {
