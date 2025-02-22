@@ -1,0 +1,28 @@
+.menuItems {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: space-evenly;
+    box-sizing: border-box;
+}
+
+.menuItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--primary);
+    height: 100%;
+    padding: 0 8px;
+    gap: 0.3rem;
+    border: 2px solid transparent;
+    border-radius: 2px;
+}
+
+
+@media(hover:hover) {
+    .menuItem:hover {
+        color: var(--primary-light);
+        background: var(--primary-track);
+        border-bottom: solid;
+    }
+}
