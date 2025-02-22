@@ -1,0 +1,65 @@
+.signInBtn {
+    background: var(--on-primary);
+    /* color: var(--on-primary); */
+    min-width: 130px;
+    text-align: center;
+    border-radius: 20px;
+    padding: 0.25rem 0;
+}
+
+.signInBtn:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.createAccount {
+    font-size: 14px;
+    padding-top: 0.5rem;
+    text-decoration: underline;
+}
+
+
+.menuDropdown {
+    /* position: relative; */
+    /* display: inline-block; */
+    background: var(--primary-track);
+    display: block;
+    position: fixed;
+    min-width: 100px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    min-width: 160px;
+    list-style-type: none;
+    right: 80px;
+    margin-top: -5px;
+    border-radius: 5px;
+}
+
+.dropDownContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 0;
+}
+
+.userButton {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.icon {
+    font-size: 32px;
+    color: var(--primary);
+}
+
+@media(hover:hover) {
+    .icon:hover {
+        color: var(--primary-light);
+    }
+    .settings:hover {
+        color: var(--primary-light);
+    }
+
+}
