@@ -7,6 +7,9 @@ import UserMenu from './user-menu';
 const meta = {
     title: 'Menu/UserMenu',
     component: UserMenu,
+    parameters: {
+        layout: 'centered',
+    },
     tags: ['autodocs'],
 } satisfies Meta<typeof UserMenu>;
 

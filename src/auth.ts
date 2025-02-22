@@ -169,6 +169,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     if (data) {
                         const prefix = process.env.NODE_ENV === "development" ? "__Dev-" : "";
                         const cookie = await cookies();
+                        const decodedAccessToken = JSON.parse(Buffer.from(data["access_token"].split(".")[1], "base64").toString());
 
                         cookie.set({
                             name: `MultiCat.refresh-token`,
@@ -180,8 +181,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                         const user = {
                             id: data["id"],
+                            username: data["username"],
                             cognitoGroups: [],
                             accessToken: data["access_token"],
+                            accessTokenExpires: Date.now() + decodedAccessToken["exp"] * 1000,
                             refreshToken: data["refresh_token"],
                             idToken: "",
                             exp: 200,

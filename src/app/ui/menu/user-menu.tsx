@@ -58,7 +58,7 @@ export default function UserMenu() {
     const [loggedIn, setLoggedIn] = useState(false);
 
     function onClick() {
-        if (!session.user["username"]) {
+        if (!!session && !!session.user["username"]) {
             console.log("Here!");
         } else {
             router.push('/account/login')
@@ -84,5 +84,5 @@ export default function UserMenu() {
                 </div>
             )}
         </div>
-    )
+    );
 }
