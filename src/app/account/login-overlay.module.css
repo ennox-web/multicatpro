@@ -1,0 +1,74 @@
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    z-index: 21;
+    background: var(--primary-widget-card);
+    border-radius: 10px;
+    padding: 2.5rem;
+    gap: 10px;
+    max-height: 100vh;
+    min-width: 400px;
+    max-width: 400px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 5px;
+}
+
+.inputField {
+    width: 100%;
+}
+
+.inputError {
+    width: 100%;
+    border: 2px solid red;
+}
+
+.signInBtn {
+    margin-top: 15px;
+    background: var(--on-primary);
+    /* color: var(--on-primary); */
+    min-width: 130px;
+    text-align: center;
+    border-radius: 20px;
+    padding: 0.25rem 0;
+    text-decoration: none;
+}
+
+.signInBtn:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.createAccount {
+    font-size: 14px;
+    padding-top: 0.5rem;
+    text-decoration: underline;
+    background: none;
+}
+
+.userBtns {
+    color: inherit;
+    border: none;
+    cursor: pointer;
+}
+
+.errorBox {
+    border: 4px solid rgb(206, 5, 5);
+    border-radius: 10px;
+    color: rgb(206, 5, 5);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.errorMessage {
+    padding: 2rem;
+}

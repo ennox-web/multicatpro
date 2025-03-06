@@ -2,6 +2,7 @@ import NextAuth, { DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 // import Google from "next-auth/providers/google";
 import { cookies } from "next/headers";
+import {type JWT} from "next-auth/jwt";
 
 declare module "next-auth" {
     interface Session {
@@ -26,7 +27,6 @@ async function refreshAccessToken(token: any) {
             error: "NoRefreshToken",
         };
     }
-    console.log("REFRESH TOKEN??: ", token.refreshToken);
 
     const response = await fetch(`${process.env.API_BASE_URL}/api/refresh`, {
         method: 'POST',
@@ -70,6 +70,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // secret: process.env.AUTH_SECRET,
     // trustHost: true,
     debug: process.env.NODE_ENV === "development",
+    events: {
+        async signOut({token}: {token: JWT}) {
+            console.log("SIGNOUT", token);
+            if(token.provider === "credentials") {
+                const response = await fetch(`${process.env.API_BASE_URL}/api/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token.accessToken}`
+                    }
+                })
+                    .then((response) => response)
+                    .catch((error) => console.error(error));
+
+                if(response) {
+                    console.log("Successfully logged out");
+                    const data = await response.json()
+                    console.log("RESP DATA", data);
+                }
+            }
+        },
+    },
     callbacks: {
         authorized({ auth, request }) {
             const privateRoutes = ["/dashboard"];
@@ -91,6 +112,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
         jwt: async ({ token, user, account }) => {
             console.log("JWT\nACCOUNT:", account, "USER:", user, "TOKEN:", token);
+            if(account) {
+                token.provider = account.provider;
+            }
+
             if (user) {
                 const accessToken = user.accessToken as String;
                 // const user = {
@@ -150,8 +175,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
                 const urlencoded = new URLSearchParams();
-                urlencoded.append("username", "blep");
-                urlencoded.append("password", "blepper");
+                urlencoded.append("username", credentials.username as string);
+                urlencoded.append("password", credentials.password as string);
 
                 const requestOptions = {
                     method: "POST",
@@ -163,7 +188,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     .then((response) => response)
                     .catch((error) => console.error(error));
 
-                if (response) {
+                if (response && response.ok) {
                     const data = await response.json();
                     console.log(data);
                     if (data) {
@@ -180,7 +205,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         });
 
                         const user = {
-                            id: data["id"],
+                            id: data["user_id"],
                             username: data["username"],
                             cognitoGroups: [],
                             accessToken: data["access_token"],

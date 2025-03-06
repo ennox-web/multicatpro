@@ -5,6 +5,8 @@
     text-align: center;
     border-radius: 20px;
     padding: 0.25rem 0;
+    text-decoration: none;
+    border: none;
 }
 
 .signInBtn:hover {
@@ -16,8 +18,22 @@
     font-size: 14px;
     padding-top: 0.5rem;
     text-decoration: underline;
+    background: none;
+    border: none;
 }
 
+.settingsBtn {
+    background: none;
+    width: 100%;
+    height: 2.5rem;
+    border: none;
+    border-left: 4px solid transparent;
+}
+
+.userBtns {
+    color: inherit;
+    cursor: pointer;
+}
 
 .menuDropdown {
     /* position: relative; */
@@ -58,8 +74,9 @@
     .icon:hover {
         color: var(--primary-light);
     }
-    .settings:hover {
-        color: var(--primary-light);
+    .settingsBtn:hover {
+        color: var(--on-primary);
+        background: var(--primary);
+        border-left: 4px solid var(--primary-chip);
     }
-
 }

@@ -3,9 +3,11 @@
 from typing import List, Optional
 
 import strawberry
+from mongoengine.queryset.visitor import Q
 
 from api.db.user import User
 from api.utils import convert_to_graphql_type, get_hashed_password
+from api.auth.email_validator import send_email
 
 
 @strawberry.type
@@ -24,7 +26,6 @@ class UserInput:
     password: str
 
 
-
 @strawberry.type
 class UserQuery:
     """UserQuery GraphQL Type."""
@@ -38,9 +39,15 @@ class UserQuery:
 class UserMutation:
     """UserMutations GraphQL Type."""
     @strawberry.mutation
-    def register_new_user(self, user_input: UserInput) -> Optional[UserGQL]:
+    async def register_new_user(self, user_input: UserInput) -> Optional[UserGQL]:
         """Add a new user"""
+        user = User.objects(Q(username=user_input.username) | Q(email=user_input.email)).first()
+        if user:
+            print(f"Username: {user.username}\nEmail: {user.email}")
+            raise Exception("Username or Email already exists")  # pylint: disable=broad-exception-raised
+
         hashed_password = get_hashed_password(user_input.password)
         user = User(username=user_input.username, password=hashed_password, email=user_input.email)
         user.save()
+        await send_email()
         return convert_to_graphql_type(user, UserGQL)

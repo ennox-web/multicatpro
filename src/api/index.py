@@ -1,7 +1,7 @@
 """FastAPI Server."""
-from datetime import timedelta
+from datetime import timedelta, datetime
 
-from fastapi import FastAPI, Depends, Request, HTTPException
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from mongoengine import disconnect
@@ -10,15 +10,16 @@ from strawberry.fastapi import GraphQLRouter
 from api.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
 from api.schemas.schema import schema
 from api.db.client import client
+from api.db.jwt_token import Token
 
-from api.auth_utils import (
+from api.auth.auth_utils import (
     authenticate_user,
     create_access_token,
-    Token,
+    TokenModel,
     get_context,
     verify_and_refresh_token,
     blacklist_token,
-    oauth2_scheme
+    oauth2_scheme,
 )
 
 
@@ -63,19 +64,29 @@ def shutdown_db_client():
     disconnect()
 
 
-@app.post("/api/login", response_model=Token)
+@app.post("/api/login", response_model=TokenModel)
 async def login(auth: OAuth2PasswordRequestForm = Depends()):
     """Login."""
     user = authenticate_user(auth.username, auth.password)
+    access_expiration = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_expiration = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     access_token = create_access_token(
         data={"sub": f"username:{user.username}"},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expires_delta=access_expiration
     )
     refresh_token = create_access_token(
         data={"sub": f"username:{user.username}"},
-        expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+        expires_delta=refresh_expiration
     )
-    return Token(
+
+    Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        access_expiration_date=datetime.now() + access_expiration,
+        refresh_expiration_date=datetime.now() + refresh_expiration
+    ).save()
+
+    return TokenModel(
         access_token=access_token,
         refresh_token=refresh_token,
         user_id=str(user.id),
@@ -84,22 +95,16 @@ async def login(auth: OAuth2PasswordRequestForm = Depends()):
     )
 
 
-@app.post("/api/refresh", response_model=Token)
+@app.post("/api/refresh", response_model=TokenModel)
 async def refresh(refresh_token: str = Depends(oauth2_scheme)):
     """Refresh JWT token."""
     if not refresh_token:
         raise HTTPException(status_code=401, detail="No valid refresh token.")
-    new_access_token = verify_and_refresh_token(refresh_token)
-    if not new_access_token:
-        raise HTTPException(status_code=401, detail="No valid refresh token.")
-    return new_access_token
+    return verify_and_refresh_token(refresh_token)
 
 
 @app.post("/api/logout")
-async def logout(request: Request):
+async def logout(access_token: str = Depends(oauth2_scheme)):
     """Logout."""
-    refresh_token = request.cookies.get("refresh_token")
-    access_token = request.cookies.get("access_token")
-    blacklist_token(refresh_token)
-    blacklist_token(access_token)
+    blacklist_token(access_token=access_token)
     return {"message": "Logout successful"}
