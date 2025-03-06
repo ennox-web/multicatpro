@@ -30,6 +30,7 @@ yarn-error.log*
 # local env files
 .env*
 /k8s-config/local/secrets
+*.key
 
 # vercel
 .vercel

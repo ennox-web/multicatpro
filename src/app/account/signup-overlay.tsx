@@ -2,8 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import styles from './login-overlay.module.css';
-import { authenticate } from "@/app/lib/actions";
 import { ChangeEvent, useEffect, useState } from "react";
+import { signUp } from "../lib/actions";
 
 interface InputField {
     label: string;
@@ -110,8 +110,8 @@ export default function SignupOverlay() {
     }, [formValues.username, formValues.email, formValues.password, formValues.repassword]);
 
     return (
-        <form action={(form) => { authenticate(form) }} className={styles.loginForm}>
-            <h1>Sign In</h1>
+        <form action={signUp} className={styles.loginForm}>
+            <h1>Sign Up</h1>
             {
                 inputFields.map((field) => {
                     return (
@@ -130,7 +130,7 @@ export default function SignupOverlay() {
                     )
                 })
             }
-            <button>Sign In</button>
+            <button type="submit" className={`${styles.signInBtn} ${styles.userBtns}`}>Create Account</button>
         </form>
     );
 }

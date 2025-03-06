@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Overlay from '@/app/account/overlay';
 import LoginOverlay from '@/app/account/login-overlay';
+import { logout } from '@/app/lib/actions';
+import SignupOverlay from '@/app/account/signup-overlay';
 
 interface MenuLink {
     name: string;
@@ -30,7 +32,6 @@ function UserMenuDropdown({ loggedIn, userMenuLinks }: { loggedIn: boolean, user
     )
 }
 
-
 export default function UserMenu() {
     const { data: session } = useSession();
     const router = useRouter();
@@ -44,6 +45,8 @@ export default function UserMenu() {
             router.push('/account/login')
         }
     }
+
+    const closeOverlay = () => {setShowOverlayType('')}
 
     const userMenuLinks: UserMenuLinks = {
         "loggedOut": [
@@ -62,7 +65,12 @@ export default function UserMenu() {
             {
                 name: "Settings",
                 onClick: () => { router.push("/account/settings") },
-                style: styles.settings,
+                style: `${styles.userBtns} ${styles.settingsBtn}`,
+            },
+            {
+                name: "Logout",
+                onClick: () => { logout() },
+                style: `${styles.userBtns} ${styles.settingsBtn}`,
             },
         ],
     }
@@ -73,24 +81,31 @@ export default function UserMenu() {
                 className={styles.userButton}
                 onClick={onClick}
                 onMouseEnter={() => { setShowMenu(true) }}
-                onMouseLeave={() => { setShowMenu(false) }}
+                onMouseLeave={() => { setShowMenu(true) }}
             >
                 <span className={`material-symbols-outlined ${styles.icon}`}>person</span>
             </button>
             {showMenu && (
                 <div
                     onMouseEnter={() => { setShowMenu(true) }}
-                    onMouseLeave={() => { setShowMenu(false) }}
+                    onMouseLeave={() => { setShowMenu(true) }}
                 >
                     <UserMenuDropdown loggedIn={!!session ? !!session.user["username"] : false} userMenuLinks={userMenuLinks} />
                 </div>
             )}
             {showOverlayType === 'login' && (
-                <Overlay onClose={() => { setShowOverlayType('') }}>
-                    <LoginOverlay onClose={() => { setShowOverlayType('') }} />
+                <Overlay onClose={closeOverlay}>
+                    <LoginOverlay
+                        onClose={closeOverlay}
+                        createAccount={() => { setShowOverlayType('signup') }}
+                    />
                 </Overlay>
-            )
-            }
+            )}
+            {showOverlayType === 'signup' && (
+                <Overlay onClose={closeOverlay}>
+                    <SignupOverlay />
+                </Overlay>
+            )}
         </div>
     );
 }

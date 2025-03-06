@@ -1,8 +1,8 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import styles from './login-overlay.module.css';
 import { authenticate } from "@/app/lib/actions";
+import { error } from 'console';
 import { ChangeEvent, useEffect, useState } from "react";
 
 interface InputField {
@@ -13,7 +13,7 @@ interface InputField {
     placeholder: string;
 }
 
-export default function LoginOverlay({ onClose }: { onClose: () => void }) {
+export default function LoginOverlay({ onClose, createAccount }: { onClose: () => void, createAccount: () => void }) {
     const [formValues, setFormValues] = useState({
         username: "",
         password: "",
@@ -21,9 +21,8 @@ export default function LoginOverlay({ onClose }: { onClose: () => void }) {
     const [formStyles, setFormStyles] = useState({
         username: styles.inputField,
         password: styles.inputField,
-    })
-    const { data: session } = useSession();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    });
+    const [errorMessage, setErrorMessage] = useState("");
 
     const inputFields: InputField[] = [
         {
@@ -71,13 +70,18 @@ export default function LoginOverlay({ onClose }: { onClose: () => void }) {
     }
 
     async function formAction(formData: FormData) {
-        const resp = await authenticate(formData);
-        console.log(resp);
-        if (resp === "Invalid credentials.") {
-            console.log("Oh no!");
+        try {
+            const resp = await authenticate(formData);
+            if (resp === "Invalid credentials.") {
+                setErrorMessage("Username or password does not match records. Please try again.")
+            }
+            else {
+                setErrorMessage("");
+                onClose();
+            }
         }
-        else {
-            onClose();
+        catch (error) {
+            console.log("Here?")
         }
     }
 
@@ -96,6 +100,11 @@ export default function LoginOverlay({ onClose }: { onClose: () => void }) {
     return (
         <form action={formAction} className={styles.loginForm}>
             <h1>Sign In</h1>
+            {errorMessage && (
+                <div className={styles.errorBox}>
+                    <h3 className={styles.errorMessage}>{errorMessage}</h3>
+                </div>
+            )}
             {
                 inputFields.map((field) => {
                     return (
@@ -114,7 +123,9 @@ export default function LoginOverlay({ onClose }: { onClose: () => void }) {
                     )
                 })
             }
-            <button className={`${styles.signInBtn} ${styles.userBtns}`}>Sign In</button>
+            <button className={`${styles.signInBtn} ${styles.userBtns}`} type='submit'>Sign In</button>
+
+            <button className={`${styles.userBtns} ${styles.createAccount}`} onClick={createAccount}>Create an Account</button>
         </form>
     );
 }
