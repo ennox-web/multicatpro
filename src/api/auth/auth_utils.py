@@ -12,7 +12,7 @@ from jwt.exceptions import InvalidTokenError
 from strawberry.fastapi import BaseContext
 from mongoengine.errors import DoesNotExist
 
-from api.config import JWT_SECRET_KEY, JWT_ALGO, ACCESS_TOKEN_EXPIRE_MINUTES
+from api.auth.config import JWT_SECRET_KEY, JWT_ALGO, ACCESS_TOKEN_EXPIRE_MINUTES
 from api.db.user import User
 from api.utils import verify_password
 from api.db.jwt_token import Token

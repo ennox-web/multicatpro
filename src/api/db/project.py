@@ -34,6 +34,7 @@ class Project(Document):
     started_on = DateTimeField()
     completed_on = DateTimeField()
     updated_on = DateTimeField(default=datetime.today())
+    created_on = DateTimeField(default=datetime.today())
 
     tags = ListField(ReferenceField(Tag), reverse_delete_rule=PULL)
     priority = IntField(default=0)

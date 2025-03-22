@@ -1,0 +1,23 @@
+.mediumPriority {
+    color: gray;
+}
+
+.lowerPriority {
+    color: #01C94A;
+}
+
+.lowPriority {
+    color: rgb(75, 243, 255);
+}
+
+.highPriority {
+    color: #E5830F;
+}
+
+.higherPriority {
+    color: red;
+}
+
+.icon {
+    font-size: 30px;
+}

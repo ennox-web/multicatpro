@@ -3,11 +3,12 @@ from datetime import timedelta, datetime
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from mongoengine import disconnect
 from strawberry.fastapi import GraphQLRouter
 
-from api.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
+from api.auth.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
 from api.schemas.schema import schema
 from api.db.client import client
 from api.db.jwt_token import Token
@@ -33,14 +34,15 @@ app.add_middleware(
     allow_origins=[
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-        'http://localhost:8000',
-        'http://127.0.0.1:8000',
+        'https://localhost:8000',
+        'https://127.0.0.1:8000',
         'http://frontend:3000',
     ],
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
 )
+app.add_middleware(HTTPSRedirectMiddleware)
 
 
 @app.get('/api/hello')

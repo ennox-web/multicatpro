@@ -1,7 +1,7 @@
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 
-from api.config import (
+from api.auth.config import (
     MAIL_USERNAME,
     MAIL_PASSWORD,
     MAIL_FROM,
