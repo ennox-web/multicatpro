@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Currently a WIP - Initial design depicted on [portfolio](https://dev.en-nox.com/#projects)
+
 # Getting Started
 
 ## Requirements
@@ -8,23 +10,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 * [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 * Docker Hub credentials and access to repository (Currently Private)
 
-
-## Installation
-```bash
-# API requirements
-python3 -m venv multicat-env
-source multicat-env/bin/activate
-pip install -r src/api/requirements.txt
-
-# Frontend requirements
-pnpm install
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
 ## Setting Up Local Environment
 
-For starting the backend locally environment with docker:
+For starting the application locally with docker:
 
 * Ensure Docker Desktop is running
 * Run the following command:
@@ -35,13 +23,8 @@ For starting the backend locally environment with docker:
 pnpm run dev
 ```
 
-GraphQL documentation will be available at [http://localhost:8000/api/graphql](http://localhost:8000/api/graphql).
-
-```bash
-# Using kubernetes
-# Requires kind and local files defining Docker secrets
-sh ./create-local-k8s-cluster.sh
-```
+Open [https://localhost:3000](https://localhost:3000) with your browser to see the result.
+GraphQL documentation will be available at [https://localhost:8000/api/graphql](http://localhost:8000/api/graphql).
 
 ## Adding a new Document and Schema Type
 
