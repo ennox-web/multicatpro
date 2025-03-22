@@ -1,5 +1,5 @@
 import styles from "./page.module.css";
-import ProjectPriorities from "./ui/content/project-priorities/project-priorities";
+import ProjectPriorities from "./ui/widget/project-priorities/project-priorities";
 
 export default function Home() {
     return (
