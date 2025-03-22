@@ -35,7 +35,7 @@ function UserMenuDropdown({ loggedIn, userMenuLinks }: { loggedIn: boolean, user
 export default function UserMenu() {
     const { data: session } = useSession();
     const router = useRouter();
-    const [showMenu, setShowMenu] = useState(true);
+    const [showMenu, setShowMenu] = useState(false);
     const [showOverlayType, setShowOverlayType] = useState('');
 
     function onClick() {
@@ -46,7 +46,7 @@ export default function UserMenu() {
         }
     }
 
-    const closeOverlay = () => {setShowOverlayType('')}
+    const closeOverlay = () => { setShowOverlayType('') }
 
     const userMenuLinks: UserMenuLinks = {
         "loggedOut": [
@@ -81,14 +81,14 @@ export default function UserMenu() {
                 className={styles.userButton}
                 onClick={onClick}
                 onMouseEnter={() => { setShowMenu(true) }}
-                onMouseLeave={() => { setShowMenu(true) }}
+                onMouseLeave={() => { setShowMenu(false) }}
             >
                 <span className={`material-symbols-outlined ${styles.icon}`}>person</span>
             </button>
             {showMenu && (
                 <div
                     onMouseEnter={() => { setShowMenu(true) }}
-                    onMouseLeave={() => { setShowMenu(true) }}
+                    onMouseLeave={() => { setShowMenu(false) }}
                 >
                     <UserMenuDropdown loggedIn={!!session ? !!session.user["username"] : false} userMenuLinks={userMenuLinks} />
                 </div>

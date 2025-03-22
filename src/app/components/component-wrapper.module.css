@@ -1,0 +1,8 @@
+.wrapper {
+    padding: 20px 35px;
+    background: var(--primary-widget-card);
+    border-radius: 25px;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+}

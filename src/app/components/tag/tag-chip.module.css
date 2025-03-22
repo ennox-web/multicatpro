@@ -1,0 +1,31 @@
+.tagBase {
+    border-radius: 100px;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.7rem;
+}
+
+.tag1 {
+    background: var(--tertiary);
+    color: var(--on-tertiary);
+}
+
+.tag2 {
+    background: var(--primary-chip);
+    color: var(--primary);
+}
+
+@media(hover:hover) {
+    .tag1:hover {
+        background: var(--on-tertiary);
+        color: var(--tertiary);
+        font-weight: 600;
+    }
+
+    .tag2:hover {
+        background: var(--primary);
+        color: var(--primary-chip);
+        font-weight: 600;
+    }
+}

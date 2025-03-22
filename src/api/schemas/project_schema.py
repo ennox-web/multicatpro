@@ -31,6 +31,7 @@ class ProjectGQL:
     started_on: Optional[datetime] = None
     completed_on: Optional[datetime] = None
     updated_on: datetime
+    created_on: datetime
 
     tags: Optional[List[TagGQL]] = None
     priority: Optional[int] = None
