@@ -1,0 +1,9 @@
+.latestWIPS {
+    display: flex;
+    flex-direction: column;
+    gap: 21px;
+}
+
+.wrapper {
+    max-width: 400px;
+}

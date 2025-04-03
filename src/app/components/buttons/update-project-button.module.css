@@ -1,0 +1,17 @@
+.updateProject {
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--tertiary-container);
+    color: var(--on-tertiary-container);
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    border: none;
+}
+
+@media(hover:hover) {
+    .updateProject:hover {
+        background: var(--on-tertiary);
+    }
+}

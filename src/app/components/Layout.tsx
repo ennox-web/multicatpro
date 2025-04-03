@@ -1,6 +1,6 @@
 
 import Menu from "../ui/menu/menu";
-import SessionProviderWrapper from "./SessionProviderWrapper";
+import SessionProviderWrapper from "./wrappers/SessionProviderWrapper";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (

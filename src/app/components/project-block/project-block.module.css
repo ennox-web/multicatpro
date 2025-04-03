@@ -1,0 +1,31 @@
+.projectName {
+    color: var(--on-tertiary);
+    font-weight: 400;
+    line-height: normal;
+}
+
+.projectType {
+    color: var(--tertiary-progress);
+}
+
+.projectBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: var(--on-tertiary-container);
+    border-radius: 15px;
+    padding: 8px 10px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.nameHeader {
+    display: flex;
+    flex-direction: column;
+}
+
+.projectBlockHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
