@@ -1,8 +1,8 @@
 import ProjectTable from "@/app/components/project-table";
 
 import styles from './project-priorities.module.css'
-import ComponentWrapper from "@/app/components/component-wrapper";
-import AddProjectButtons from "@/app/components/add-project-buttons";
+import ComponentWrapper from "@/app/components/wrappers/component-wrapper";
+import AddProjectButtons from "@/app/components/buttons/add-project-buttons";
 
 export default function ProjectPriorities() {
     return (

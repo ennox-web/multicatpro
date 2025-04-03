@@ -39,6 +39,12 @@
     --tertiary: #184155;
     /* 86 */
     --tertiary-progress: #2399d1;
+
+    --progress-gradient: linear-gradient(
+        to right,
+        #724FE4,
+        #01C9AE
+    )
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -85,6 +91,20 @@ h4 {
     font-weight: 600;
     line-height: 24px;
     text-transform: uppercase;
+}
+
+h5 {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+h6 {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 * {

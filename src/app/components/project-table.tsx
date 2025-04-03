@@ -5,7 +5,9 @@ import {
     flexRender,
     getCoreRowModel,
     getSortedRowModel,
-    useReactTable
+    useReactTable,
+    CellContext as TanCellContext,
+    RowData,
 } from '@tanstack/react-table';
 import { useReducer, useState } from 'react';
 import { ProjectInterface, projectTestData } from '@/app/api/data/project-data';
@@ -13,18 +15,15 @@ import styles from './project-table.module.css';
 import TagChipList from './tag/tag-chip-list';
 import PriorityIcon from './priority-icon';
 
+type CellContext<TData extends RowData, TValue> = TanCellContext<TData, TValue> & {
+    sortedIndex: number;
+};
 
 const columnHelper = createColumnHelper<ProjectInterface>();
 
-// TODO: Drag and Drop?
-// TODO: Server-side sorting - https://tanstack.com/table/v8/docs/guide/sorting
-// TODO: Pagination
-// TODO: Number of projects to show
-
-
 const columns = [
     columnHelper.accessor('name', {
-        cell: info => info.getValue(),
+        // cell: info => info.getValue(),
         header: () => <b>Name</b>,
         sortingFn: 'alphanumeric',
     }),
@@ -50,18 +49,15 @@ const columns = [
     }),
     columnHelper.accessor('tags', {
         cell: info => {
-            console.log(info.row.index, info.getValue());
+            const infoCasted = info as CellContext<ProjectInterface, unknown>;
+            console.log("Here?", infoCasted.sortedIndex, info.getValue());
             return (
-                <TagChipList tags={info.getValue()} rowIndex={info.row.index} />
+                <TagChipList tags={info.getValue()} rowIndex={infoCasted.sortedIndex} />
             )
         },
         header: () => <b>Tags</b>,
         enableSorting: false,
     })
-    // columnHelper.accessor('category', {
-    //     header: () => 'Category',
-    //     cell: info => info.renderValue(),
-    // }),
 ]
 
 export default function ProjectTable() {
@@ -125,14 +121,14 @@ export default function ProjectTable() {
                     </thead>
                     <tbody>
                         {/* Render table rows */}
-                        {table.getRowModel().rows.map((row) => (
+                        {table.getRowModel().rows.map((row, index) => (
                             <tr key={row.id} className={styles.tableRow}>
                                 {row.getVisibleCells().map((cell) => (
                                     <td key={cell.id} className={styles.tableCell}>
                                         {/* Render each cell's content */}
                                         {flexRender(
                                             cell.column.columnDef.cell, // Cell definition
-                                            cell.getContext() // Context for the cell
+                                            { ...cell.getContext(), sortedIndex: index } // Context for the cell
                                         )}
                                     </td>
                                 ))}
