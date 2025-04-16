@@ -1,0 +1,23 @@
+.page {
+    display: flex;
+    flex-direction: column;
+}
+
+.widgetsWrapper {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr 1fr 100px;
+    grid-template-rows: auto;
+}
+
+.projectPriorities {
+    grid-column-start: 2;
+    grid-column-end: 5;
+}
+
+.latestWips {
+    grid-column-start: 2;
+}
+
+.goals {
+    grid-column-start: 3;
+}

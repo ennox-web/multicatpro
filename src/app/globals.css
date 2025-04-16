@@ -30,6 +30,7 @@
 
     --tertiary-container: #25aeef;
     --on-tertiary: #A0E0FF;
+    --on-tertiary-light: #D8F2FF;
     --outlined-tertiary: #7ECFF6;
     --tertiary-toggle: #1d749b;
     --tertiary-header: #244b5e;
@@ -44,7 +45,19 @@
         to right,
         #724FE4,
         #01C9AE
-    )
+    );
+
+    --triadic: #340e3a;
+    --on-triadic: #e090ed;
+    --on-triadic-light: #E8C5EE;
+    --on-triadic-goal: #ce67df;
+    --triadic-goal: #1d111f;
+
+    --secondary-container: #292146;
+    --secondary-goal-type: #9777FF;
+    --on-secondary: #B099EE;
+    --on-secondary-light: #E4DAFF;
+    --secondary-goal: #1b1827;
 }
 
 /* @media (prefers-color-scheme: dark) {

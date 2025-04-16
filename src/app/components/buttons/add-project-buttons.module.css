@@ -11,3 +11,9 @@
     font-size: 16px;
     cursor: pointer;
 }
+
+@media(hover:hover) {
+    .button:hover {
+        color: var(--primary-light);
+    }
+}

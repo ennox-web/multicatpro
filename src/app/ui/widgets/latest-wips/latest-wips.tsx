@@ -7,7 +7,7 @@ import { projectTestData } from "@/app/api/data/project-data";
 export default function LatestWIPs({ max = 3 }: { max?: number }) {
     var projectData = projectTestData;
     if (max > 0) {
-        projectData.sort((a, b) => a.updatedOn.getTime() - b.updatedOn.getTime());
+        projectData.sort((a, b) => b.updatedOn.getTime() - a.updatedOn.getTime());
         projectData = projectData.slice(0, max);
     }
 

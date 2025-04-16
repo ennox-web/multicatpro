@@ -1,0 +1,151 @@
+/* .goalsBlock {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 15px;
+    padding: 8px 10px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    gap: 5px;
+} */
+
+.test {
+    padding-right: 5px;
+}
+
+.goalsBlock {
+    display: grid;
+    grid-template-columns: [header] 100px [desc] 1fr;
+    border-radius: 15px;
+    padding: 10px 8px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    gap: 8px;
+    overflow-wrap: break-word;
+}
+
+.goalsHeader {
+    display: grid;
+    grid-template-columns: [pin] 24px [header] 1fr;
+}
+
+.goalPin {
+    animation: drop-pin 0.3s linear forwards;
+}
+
+.pin {
+    font-size: 22px;
+    transform: rotate(-25deg);
+    background: none;
+    border: none;
+    color: inherit;
+    display: inline-flex;
+    align-self: center;
+}
+
+.unpinned {
+    transform: none !important;
+    padding-top: 3px;
+    padding-left: 3px;
+    font-size: 16px;
+    transform: rotate(-25deg);
+    background: none;
+    border: none;
+    color: inherit;
+    display: inline-flex;
+    align-self: center;
+}
+
+.mainHeader {
+    grid-column-start: header;
+    display: flex;
+    flex-direction: column;
+}
+
+.dailyGoal {
+    background: var(--triadic-goal);
+    color: var(--on-triadic);
+}
+
+.dailyGoalType {
+    color: var(--on-triadic-goal);
+}
+
+.weeklyGoal {
+    background: var(--on-primary);
+    color: var(--primary);
+}
+
+.weeklyGoalType {
+    color: var(--primary-fade-button);
+}
+
+.monthlyGoal {
+    background: var(--on-tertiary-container);
+    color: var(--on-tertiary);
+}
+
+.monthlyGoalType {
+    color: var(--tertiary-container);
+}
+
+.annuallyGoal {
+    background: var(--secondary-goal);
+    color: var(--on-secondary);
+}
+
+.annuallyGoalType {
+    color: var(--secondary-goal-type);
+}
+
+.icon {
+    margin-right: 8px;
+}
+
+.goalMainDesc {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.goalDesc {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap: 8px;
+}
+
+.goalButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+}
+
+@media(hover:hover) {
+    .goalButtonDaily:hover {
+        color: var(--on-triadic-light);
+    }
+
+    .goalButtonWeekly:hover {
+        color: var(--primary-light);
+    }
+
+    .goalButtonMonthly:hover {
+        color: var(--on-tertiary-light);
+    }
+
+    .goalButtonAnnually:hover {
+        color: var(--on-secondary-light);
+    }
+}
+
+@keyframes drop-pin {
+    0% {
+        transform: translateY(-12px) translateX(-5px) rotate(-25deg);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0px) rotate(-25deg);
+        opacity: 1;
+    }
+}
