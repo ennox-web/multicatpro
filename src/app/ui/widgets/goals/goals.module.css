@@ -1,6 +1,9 @@
-.priorities {
+.goals {
     display: flex;
     flex-direction: column;
     gap: 21px;
-    width: 100%;
+}
+
+.wrapper {
+    max-width: 500px;
 }

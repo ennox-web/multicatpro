@@ -1,9 +1,12 @@
 import styles from "./page.module.css";
-import LatestWIPs from "./ui/widgets/latest-wips/latest-wips";
-import ProjectPriorities from "./ui/widgets/project-priorities/project-priorities";
 
+// Overall:
+// TODO: Update "Add" buttons to be a plus icon in the top right corner of the widgets
+
+// Project Block:
 // TODO: Add functionality to "UpdateProjectButton"
 // TODO: Add functionality to "Add Project" Buttons
+// TODO: Make the Project Name in "project block" a button for users to click on to view details in a modal
 
 // Project Table:
 // TODO: Drag and Drop?
@@ -11,12 +14,18 @@ import ProjectPriorities from "./ui/widgets/project-priorities/project-prioritie
 // TODO: Pagination
 // TODO: Number of projects to show
 
+// Goals:
+// TODO: Add functionality to "Add Goal" Buttons
+// TODO: Add functionality to Goal button
+// TODO: Add pin functionality to update goal pinned status and reorder goals as necessary
+// (must add function to Goal Block List and pass down)
+
+
 export default function Home() {
     return (
         <div className={styles.page}>
             <div>
-                <LatestWIPs />
-                <ProjectPriorities />
+                Home Page
             </div>
         </div>
     );

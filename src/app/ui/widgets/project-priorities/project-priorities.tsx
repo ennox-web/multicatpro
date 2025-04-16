@@ -1,4 +1,4 @@
-import ProjectTable from "@/app/components/project-table";
+import ProjectTable from "@/app/components/project-table/project-table";
 
 import styles from './project-priorities.module.css'
 import ComponentWrapper from "@/app/components/wrappers/component-wrapper";

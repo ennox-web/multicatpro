@@ -6,26 +6,48 @@
     padding: 0 0.5rem;
 }
 
-.tag1 {
+.tertiary {
     background: var(--tertiary);
     color: var(--on-tertiary);
 }
 
-.tag2 {
+.primary {
     background: var(--primary-chip);
     color: var(--primary);
 }
 
+.triadic {
+    background: var(--triadic);
+    color: var(--on-triadic);
+}
+
+.secondary {
+    background: var(--secondary-container);
+    color: var(--on-secondary);
+}
+
 @media(hover:hover) {
-    .tag1:hover {
+    .tertiary:hover {
         background: var(--on-tertiary);
         color: var(--tertiary);
         font-weight: 600;
     }
 
-    .tag2:hover {
+    .primary:hover {
         background: var(--primary);
         color: var(--primary-chip);
+        font-weight: 600;
+    }
+
+    .triadic:hover {
+        background: var(--on-triadic);
+        color: var(--triadic);
+        font-weight: 600;
+    }
+
+    .secondary:hover {
+        background: var(--on-secondary);
+        color: var(--secondary-container);
         font-weight: 600;
     }
 }

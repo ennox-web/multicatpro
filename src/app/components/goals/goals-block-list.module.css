@@ -1,6 +1,5 @@
-.priorities {
+.goalsList {
     display: flex;
     flex-direction: column;
-    gap: 21px;
-    width: 100%;
+    gap: 12px;
 }

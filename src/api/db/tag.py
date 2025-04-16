@@ -8,6 +8,6 @@ from mongoengine import (
 from api.db.user import User
 
 class Tag(Document):
-    """Tag EmbeddedDocument for MongoDB."""
+    """Tag Document for MongoDB."""
     name = StringField(required=True)
     user = LazyReferenceField(User, required=True, reverse_delete_rule=CASCADE)

@@ -12,7 +12,7 @@ import {
 import { useReducer, useState } from 'react';
 import { ProjectInterface, projectTestData } from '@/app/api/data/project-data';
 import styles from './project-table.module.css';
-import TagChipList from './tag/tag-chip-list';
+import TagChipList from '../tag/tag-chip-list';
 import PriorityIcon from './priority-icon';
 
 type CellContext<TData extends RowData, TValue> = TanCellContext<TData, TValue> & {
@@ -50,7 +50,6 @@ const columns = [
     columnHelper.accessor('tags', {
         cell: info => {
             const infoCasted = info as CellContext<ProjectInterface, unknown>;
-            console.log("Here?", infoCasted.sortedIndex, info.getValue());
             return (
                 <TagChipList tags={info.getValue()} rowIndex={infoCasted.sortedIndex} />
             )
@@ -128,7 +127,7 @@ export default function ProjectTable() {
                                         {/* Render each cell's content */}
                                         {flexRender(
                                             cell.column.columnDef.cell, // Cell definition
-                                            { ...cell.getContext(), sortedIndex: index } // Context for the cell
+                                            { ...cell.getContext(), sortedIndex: index } as CellContext<ProjectInterface, unknown> // Context for the cell
                                         )}
                                     </td>
                                 ))}
